@@ -82,17 +82,17 @@ void DHT::begin(uint8_t usec) {
  *          true if in force mode
  *	@return Temperature value in selected scale
  */
-float DHT::readTemperature(bool S, bool force) {
-  float f = NAN;
+int16_t DHT::readTemperature(bool S, bool force) {
+  int16_t f = 0;
 
   if (read(force)) {
     switch (_type) {
     case DHT11:
-      f = data[2];
+      f = data[2] * 10;
       if (data[3] & 0x80) {
         f = -1 - f;
       }
-      f += (data[3] & 0x0f) * 0.1;
+      f += (data[3] & 0x0f);
       if (S) {
         f = convertCtoF(f);
       }
@@ -145,13 +145,13 @@ float DHT::convertFtoC(float f) { return (f - 32) * 0.55555; }
  *					force read mode
  *	@return float value - humidity in percent
  */
-float DHT::readHumidity(bool force) {
-  float f = NAN;
+uint16_t DHT::readHumidity(bool force) {
+  uint16_t f = 0;
   if (read(force)) {
     switch (_type) {
     case DHT11:
     case DHT12:
-      f = data[0] + data[1] * 0.1;
+      f = data[0] * 10 + data[1];
       break;
     case DHT22:
     case DHT21:
